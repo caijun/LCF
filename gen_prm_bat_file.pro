@@ -1,7 +1,7 @@
 ;+
 ;  Generating prm file and bat file for MRTSwath to automated batch processing
 ;
-;                       Version: 1.2.5 (2013-12-8)
+;                       Version: 1.2.6 (2013-12-15)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -24,26 +24,21 @@ PRO GEN_PRM_BAT_FILE
   MOYD35GeoRefDir = pdir + '\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\'
   IF FILE_TEST(MOYD35GeoRefDir, /DIRECTORY, /WRITE) EQ 0 THEN FILE_MKDIR, MOYD35GeoRefDir
   
-  
-  MOYD35list = FILE_SEARCH(MOYD35Dir, '*.hdf', count = count, /fully_qualify_path)
-  IF count EQ 0 THEN RETURN
-  
-  outdir = FILE_DIRNAME(MOYD35list[0]) + '\prm\'
+  outdir = MOYD35Dir + 'prm\'
   IF FILE_TEST(outdir, /DIRECTORY, /WRITE) EQ 0 THEN FILE_MKDIR, outdir
   
-  batfile = outdir + 'mrtswathbat.bat'
-  ; Delete the existed mrtswathbat.bat file
+  batfile = outdir + 'mrtswath.bat'
+  ; Delete the existed mrtswath.bat file
   IF FILE_TEST(batfile) EQ 1 THEN FILE_DELETE, batfile
   
-  ; Wrong HDF file
-  wfile = MOYD35Dir + 'redownload.txt'
-  IF FILE_TEST(wfile) EQ 1 THEN FILE_DELETE, wfile
+  MOYD35list = FILE_SEARCH(MOYD35Dir, '*.hdf', count = MOYD35_count, /FULLY_QUALIFY_PATH)
+  IF count EQ 0 THEN RETURN
   
-  FOR i = 0, count - 1 DO BEGIN
+  FOR i = 0, MOYD35_count - 1 DO BEGIN
     fname = MOYD35list[i]
     ; Write prm file
-    fbasename = FILE_BASENAME(fname)
-    str = STRSPLIT(fbasename, '.', /extract)
+    fbname = FILE_BASENAME(fname)
+    str = STRSPLIT(fbname, '.', /EXTRACT)
     prmfile = outdir + str[0] + '.' + str[1] + '.' + str[2] + '.prm'
     PRINT, prmfile
     
@@ -54,7 +49,8 @@ PRO GEN_PRM_BAT_FILE
     PRINTF, lun, ''
     
     pattern = '*.' + str[1] + '.' + str[2] + '*.hdf'
-    MOYD03list = FILE_SEARCH(MOYD03Dir, pattern, /fully_qualify_path)
+    MOYD03list = FILE_SEARCH(MOYD03Dir, pattern, count = MOYD03_count, /FULLY_QUALIFY_PATH)
+    IF MOYD03_count NE 1 THEN RETURN
     
     MOYD03file = MOYD03list[0]
     geolocation_filename = 'GEOLOCATION_FILENAME = ' + MOYD03file
@@ -71,11 +67,7 @@ PRO GEN_PRM_BAT_FILE
     PRINTF, lun, output_spatial_subset_type
     BoundingRect = GETBOUNDINGRECT(fname, spatial_subset_type)
     IF BoundingRect EQ !NULL THEN BEGIN
-      ; Write the wrong HDF file to  redownload.txt
-      OPENW, wlun, wfile, /get_lun, /append
-      PRINTF, wlun, FILE_BASENAME(fname)
-      FREE_LUN, wlun
-      ; Stop writing to prmfile and delete it
+      ; Stop writing prmfile and delete it
       FREE_LUN, lun
       FILE_DELETE, prmfile
       CONTINUE
@@ -106,8 +98,7 @@ PRO GEN_PRM_BAT_FILE
     PRINTF, lun, kernel_type
     PRINTF, lun, ''
     
-    ; output_proj_num = 'OUTPUT_PROJECTION_NUMBER = GEO'
-    output_proj_num = 'OUTPUT_PROJECTION_NUMBER = UTM'
+    output_proj_num = 'OUTPUT_PROJECTION_NUMBER = GEO'
     PRINTF, lun, output_proj_num
     PRINTF, lun, ''
     
@@ -120,8 +111,8 @@ PRO GEN_PRM_BAT_FILE
     PRINTF, lun, ''
     FREE_LUN, lun
     
-    ; Write Batch file
-    OPENW, lun, batfile, /get_lun, /append
+    ; Write batch file
+    OPENW, lun, batfile, /GET_LUN, /APPEND
     
     cmd = 'swath2grid -pf=' + prmfile
     PRINTF, lun, cmd
