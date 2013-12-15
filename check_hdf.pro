@@ -1,7 +1,7 @@
 ;+
 ;    Check HDF integrity and record the invalid HDF files for redowndload
-;           
-;                       Version: 1.0.0 (2013-12-15)
+;
+;                       Version: 1.1.0 (2013-12-15)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -31,6 +31,9 @@ PRO CHECK_HDF
     
     FOR j = 0,  num_hdf - 1 DO BEGIN
       fname = flist[j]
+      fbname = FILE_BASENAME(fname)
+      str = STRSPLIT(fbname, '.', /EXTRACT)
+      IF str[0] EQ 'MYD35_L2' THEN SDS_name = 'Cloud_Mask' ELSE SDS_name = ['Longitude', 'Latitude']
       
       CATCH, Error_status
       IF Error_status NE 0 THEN BEGIN
@@ -46,7 +49,16 @@ PRO CHECK_HDF
         CONTINUE
       ENDIF
       
+      ; Try to catch Error index: -1112
       SDinterface_id = HDF_SD_START(fname, /READ)
+      FOR k = 0, N_ELEMENTS(SDS_name) - 1 DO BEGIN
+        index = HDF_SD_NAMETOINDEX(SDinterface_id, SDS_name[k])
+        ; Try to catch Error index: -1113
+        SDdataset_id = HDF_SD_SELECT(SDinterface_id, index)
+        ; Try to catch Error index: -1119
+        HDF_SD_GETDATA, SDdataset_id, data
+        HDF_SD_ENDACCESS, SDdataset_id
+      ENDFOR
       HDF_SD_END, SDinterface_id
     ENDFOR
   ENDFOR
