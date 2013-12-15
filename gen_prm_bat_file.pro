@@ -19,9 +19,9 @@ PRO GEN_PRM_BAT_FILE
   ; Custimize MOD03Dir and MOD35GeoRef
   year = 2003
   pdir = 'H:\People\ZhangYawen\C6\'
-  MOYD35Dir = pdir + '\MYD35\' + STRTRIM(STRING(year), 1) + '\'
-  MOYD03Dir = pdir + '\MYD03\' + STRTRIM(STRING(year), 1) + '\'
-  MOYD35GeoRefDir = pdir + '\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\'
+  MOYD35Dir = pdir + 'MYD35\' + STRTRIM(STRING(year), 1) + '\'
+  MOYD03Dir = pdir + 'MYD03\' + STRTRIM(STRING(year), 1) + '\'
+  MOYD35GeoRefDir = pdir + 'MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\'
   IF FILE_TEST(MOYD35GeoRefDir, /DIRECTORY, /WRITE) EQ 0 THEN FILE_MKDIR, MOYD35GeoRefDir
   
   outdir = MOYD35Dir + 'prm\'
