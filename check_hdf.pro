@@ -1,7 +1,7 @@
 ;+
 ;    Check HDF integrity and record the invalid HDF files for redowndload
 ;
-;                       Version: 1.1.0 (2013-12-15)
+;                       Version: 1.2.0 (2013-12-16)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -24,10 +24,42 @@ PRO CHECK_HDF
     ; Record wrong HDF files
     whdf = subdir + '.redownload.txt'
     PRINT, whdf
-    IF FILE_TEST(whdf) EQ 1 THEN FILE_DELETE, whdf
     
-    flist = FILE_SEARCH(subdir, '*.hdf', count = num_hdf, /FULLY_QUALIFY_PATH)
-    IF num_hdf EQ 0 THEN RETURN
+    ; First check
+    IF FILE_TEST(whdf) EQ 0 THEN BEGIN
+      flist = FILE_SEARCH(subdir, '*.hdf', count = num_hdf, /FULLY_QUALIFY_PATH)
+      IF num_hdf EQ 0 THEN CONTINUE
+    ENDIF ELSE BEGIN
+      ; Read previous checking results and only check those files to save time
+      results = QUERY_ASCII(whdf, info)
+      num_hdf = info.LINES - 1
+      IF num_hdf EQ 0 THEN BEGIN
+        CONTINUE
+      ENDIF ELSE BEGIN
+        header = ''
+        ; Records of wrong HDF files
+        records = !NULL
+        records = STRARR(num_hdf)
+        OPENR, lun, whdf, /GET_LUN
+        ; Skip header
+        READF, lun, header
+        READF, lun, records
+        FREE_LUN, lun
+        ; Split records to rows*cols
+        ; Note: records is a LIST
+        records = STRSPLIT(records, ', ', /EXTRACT)
+        flist = STRARR(num_hdf)
+        FOR k = 0, num_hdf - 1 DO flist[k] = subdir + '\' + (records[k])[0]
+        
+        FILE_DELETE, whdf
+      ENDELSE
+    ENDELSE
+    
+    ; Write header to redownload.txt
+    header = ['File Name', 'Error Index', 'Error Message']
+    OPENW, lun, whdf, /GET_LUN
+    PRINTF, lun, header, format = '(3(A, :, ", "))'
+    FREE_LUN, lun
     
     FOR j = 0,  num_hdf - 1 DO BEGIN
       fname = flist[j]
@@ -37,12 +69,13 @@ PRO CHECK_HDF
       
       CATCH, Error_status
       IF Error_status NE 0 THEN BEGIN
-        PRINT, fname
-        ; Write the wrong HDF file name to redownload.txt
+        ; Write record to redownload.txt
+        record = [FILE_BASENAME(fname), STRTRIM(STRING(Error_status), 1), !ERROR_STATE.MSG]
         OPENW, lun, whdf, /GET_LUN, /APPEND
-        PRINTF, lun, FILE_BASENAME(fname)
+        PRINTF, lun, record, format = '(3(A, :, ", "))'
         FREE_LUN, lun
-        
+        ; Print on console
+        PRINT, fname
         PRINT, 'Error index: ', Error_status
         PRINT, 'Error message: ', !ERROR_STATE.MSG
         CATCH, /CANCEL
