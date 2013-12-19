@@ -59,8 +59,10 @@ PRO DETECTLOWCLOUD, cloudmask, lowcloud, DAY = DAY
   ; (BIT2 EQ 0) AND ((BIT14 EQ 1) AND (BIT15 EQ 1) AND (BIT16 EQ 1) AND (BIT18 EQ 1)) AND ((BIT19 EQ 0) AND (BIT20 EQ 0))
   ; Algorithm for night
   ; (BIT2 EQ 0) AND ((BIT14 EQ 1) AND (BIT15 EQ 1) AND (BIT17 EQ 1) AND (BIT18 EQ 1)) AND ((BIT19 EQ 0) AND (BIT27 EQ 0))
-  ; 1: Yes
-  ; 0: No
+  ; Value meaning
+  ; 0: no low cloud
+  ; 1: low cloud
+  ; 2: high cloud
   lowcloud = (bitdata[*, *, 0] EQ 0) AND ((bitdata[*, *, 1] EQ 1) AND (bitdata[*, *, 2] EQ 1) AND (bitdata[*, *, 3] EQ 1) AND (bitdata[*, *, 4] EQ 1)) $
     AND ((bitdata[*, *, 5] EQ 0) AND (bitdata[*, *, 6] EQ 0))
   hcidx = WHERE(highcloud EQ 1)
