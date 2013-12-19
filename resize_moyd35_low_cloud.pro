@@ -1,7 +1,7 @@
 ;+
 ;       Resizing all MOYD35 low cloud bands to same spatial resolution
 ;
-;                       Version: 1.1.5 (2013-10-24)
+;                       Version: 1.2.5 (2013-12-19)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
