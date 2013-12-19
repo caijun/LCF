@@ -60,7 +60,7 @@ PRO DETECT_LOW_CLOUD_FROM_MOD35
     ENDELSE
     
     fbname = FILE_BASENAME(fname, 'Cloud_Mask_b5.tif')
-    out_name = outdir + fbname + 'LowCloud.tif'
+    out_name = outdir + fbname + 'LC.tif'
     PRINT, out_name
     ENVI_WRITE_ENVI_FILE, lowcloud, out_name = out_name, bnames = bnames, map_info = map_info, r_fid = fid
     
