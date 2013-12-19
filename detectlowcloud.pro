@@ -1,7 +1,7 @@
 ;+
 ;                    Algorithm for detecting low cloud
 ;
-;                       Version: 1.0.0 (2013-12-9)
+;                       Version: 1.1.0 (2013-12-19)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -53,6 +53,7 @@ PRO DETECTLOWCLOUD, cloudmask, lowcloud, DAY = DAY
   
   ; Detecting high cloud including the situation that both low cloud and high cloud exist
   highcloud = (bitdata[*, *, 1] EQ 0) OR (bitdata[*, *, 2] EQ 0) OR (bitdata[*, *, 3] EQ 0) OR (bitdata[*, *, 4] EQ 0)
+  hcidx = WHERE(highcloud EQ 1)
   ; Detecting low cloud, which is underestimated as the situation that both low cloud and high cloud exist is excluded
   ; (cloudy|probably cloudy) AND (no high cloud) AND (low cloud)
   ; Algorithm for day
@@ -60,11 +61,16 @@ PRO DETECTLOWCLOUD, cloudmask, lowcloud, DAY = DAY
   ; Algorithm for night
   ; (BIT2 EQ 0) AND ((BIT14 EQ 1) AND (BIT15 EQ 1) AND (BIT17 EQ 1) AND (BIT18 EQ 1)) AND ((BIT19 EQ 0) AND (BIT27 EQ 0))
   ; Value meaning
-  ; 0: no low cloud
-  ; 1: low cloud
-  ; 2: high cloud
+  ; 0: background
+  ; 1: no low cloud
+  ; 2: low cloud
+  ; 3: high cloud
   lowcloud = (bitdata[*, *, 0] EQ 0) AND ((bitdata[*, *, 1] EQ 1) AND (bitdata[*, *, 2] EQ 1) AND (bitdata[*, *, 3] EQ 1) AND (bitdata[*, *, 4] EQ 1)) $
     AND ((bitdata[*, *, 5] EQ 0) AND (bitdata[*, *, 6] EQ 0))
-  hcidx = WHERE(highcloud EQ 1)
-  lowcloud[hcidx] = 2
+  lowcloud = lowcloud + 1
+  lowcloud[hcidx] = 3
+  ; Determine backgroud value (0)
+  bgidx = WHERE((cloudmask[*, *, 0] EQ 0) AND (cloudmask[*, *, 1] EQ 0) AND (cloudmask[*, *, 2] EQ 0) AND $
+    (cloudmask[*, *, 3] EQ 0) AND (cloudmask[*, *, 4] EQ 0) AND (cloudmask[*, *, 5] EQ 0))
+  lowcloud[bgidx] = 0
 END
