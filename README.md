@@ -12,5 +12,5 @@ IDL procedures for calculating Low Cloud Frequency (LCF) from the MODIS Cloud Pr
 
 #### Data preprocessing
 1. Run *detect_low_cloud_from_mod35.pro* to detect low cloud from MOD/MYD35 Cloud Mask. The value meanings are: 0 - no low cloud, 1 - low cloud and 2 - high cloud.
-2. Run *resize_mod35_low_cloud.pro* to resample all low cloud image to same pixel size. It's an essential step before excuting the following step 3 ccorrectly.
+2. Run *resize_mod35_low_cloud.pro* to resample all low cloud image to same pixel size. It's an essential step before excuting the following step 3 correctly.
 3. Run *mosaic_mod35_low_cloud.pro* to get a fully image that covers the study area for day (0) or night (1).
