@@ -11,7 +11,7 @@
 ;               (School of Environment, Tsinghua University)
 ; (College of Global Change and Earth System Science, Beijing Normal University)
 ;-
-PRO RESIZE_MOYD35_LOW_CLOUD
+PRO RESIZE_MOD35_LOW_CLOUD
   COMPILE_OPT IDL2
   
   ENVI, /RESTORE_BASE_SAVE_FILES
