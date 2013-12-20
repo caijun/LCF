@@ -1,0 +1,81 @@
+;+
+;       Extacting monthly LCF via evf and writing results to ASCII file
+;
+;                       Version: 1.1.3 (2013-12-21)
+;
+;                    Author: Tony Tsai, Ph.D. Student
+;          (Center for Earth System Science, Tsinghua University)
+;               Contact Email: cai-j12@mails.tsinghua.edu.cn
+;
+;                    Copyright: belongs to Dr.Xu's Lab
+;               (School of Environment, Tsinghua University)
+; (College of Global Change and Earth System Science, Beijing Normal University)
+;-
+PRO GET_MOD35_LCF_VIA_EVF
+  COMPILE_OPT IDL2
+  
+  RESOLVE_ROUTINE, 'GETDATAVIAEVF'
+  
+  ENVI, /RESTORE_BASE_SAVE_FILES
+  ENVI_BATCH_INIT, /NO_STATUS_WINDOW
+  
+  ; Customize year and indir
+  year = 2003
+  indir = 'H:\People\ZhangYawen\C6\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\LCF\'
+  CD, indir
+  
+  ; Set output directory
+  outdir = indir + 'ROIData\'
+  IF FILE_TEST(outdir, /DIRECTORY, /write) EQ 0 THEN FILE_MKDIR, outdir
+  ; Product: PPR, LCF1, LCF2
+  prod = ['PPR', 'LCF1', 'LCF2']
+  ; Coverage option: 0 - day data, 1 - night data
+  co = ['0', '1']
+  
+  evf_fname = 'H:\People\ZhangYawen\Vector\NorthChinaPlain\WeatherStation\Station.evf'
+  ; Open evf file
+  evf_id = ENVI_EVF_OPEN(evf_fname)
+  ; Get the vector information
+  ENVI_EVF_INFO, evf_id, num_recs = num_recs
+  
+  coords = DBLARR(2, num_recs)
+  FOR i = 0, num_recs - 1 DO BEGIN
+    record = ENVI_EVF_READ_RECORD(evf_id, i)
+    coords[*, i] = record
+  ENDFOR
+  ; Close the EVF file
+  ENVI_EVF_CLOSE, evf_id
+  
+  num_months = 12
+  months = INDGEN(num_months) + 1
+  ROIData = DBLARR(num_months, num_recs)
+  FOR t = 0, N_ELEMENTS(co) - 1 DO BEGIN
+    FOR k = 0, N_ELEMENTS(prod) - 1 DO BEGIN
+      FOR i = 0, num_months - 1 DO BEGIN
+        fname = 'MYD35_L2_A' + STRTRIM(STRING(year), 1) + STRTRIM(STRING(months[i], $
+          format = '(I02)'), 1) + '_' + co[t] +'_' + prod[k] + '.tif'
+          
+        GETDATAVIAEVF, fname, evf_fname, roi_data
+        ROIData[i, *] = roi_data
+      ENDFOR
+      
+      ; Set output file name
+      txtfile = outdir + 'MYD35_L2_A' + STRTRIM(STRING(year), 1) + '_' + co[t] + '_' + prod + '.txt'
+      PRINT, txtfile
+      ; Write ROIData to ASCII file
+      OPENW, lun, txtfile, /get_lun
+      ; Print header
+      header = [['ID', 'Lng', 'Lat'], STRTRIM(STRING(months, format = '(I02)'), 1)]
+      PRINTF, lun, header
+      ; Print data
+      FOR i = 0, num_recs - 1 DO BEGIN
+        line = [STRTRIM(STRING(i + 1), 1), STRTRIM(STRING(coords[*, i]), 1), $
+          STRTRIM(STRING(ROIData[*, i], format = '(F6.4)'),1)]
+        PRINTF, lun, line
+      ENDFOR
+      FREE_LUN, lun
+    ENDFOR
+  ENDFOR
+  
+  ENVI_BATCH_EXIT
+END
