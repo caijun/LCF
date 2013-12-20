@@ -13,7 +13,7 @@
 ;               (School of Environment, Tsinghua University)
 ; (College of Global Change and Earth System Science, Beijing Normal University)
 ;-
-PRO MOSAIC_MOD35_LOW_CLOUD
+PRO MOSAIC_MOD35_LC
   COMPILE_OPT IDL2
   
   RESOLVE_ROUTINE, 'GEOREF_MOSAIC_SETUP'
@@ -93,7 +93,7 @@ PRO MOSAIC_MOD35_LOW_CLOUD
           use_see_through[k] = 1
         ENDFOR
         ; Call georef_mosaic_setup to calculate the xsize, ysize, x0, y0, and map_info structure.
-        ; Pass the fids of the two input files and output pixel size you want.
+        ; Pass the fids of the multi-input files and output pixel size you want.
         GEOREF_MOSAIC_SETUP, fids = fids, dims = dims, out_ps = out_ps, xsize = xsize, ysize = ysize, $
           x0 = x0, y0 = y0, map_info = map_info
           

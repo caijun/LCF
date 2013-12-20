@@ -11,7 +11,7 @@
 ;               (School of Environment, Tsinghua University)
 ; (College of Global Change and Earth System Science, Beijing Normal University)
 ;-
-PRO DETECT_LOW_CLOUD_FROM_MOD35
+PRO DETECT_LC_FROM_MOD35
   COMPILE_OPT IDL2
   RESOLVE_ROUTINE, 'DETECTLOWCLOUD'
   

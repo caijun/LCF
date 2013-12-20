@@ -11,7 +11,7 @@
 ;               (School of Environment, Tsinghua University)
 ; (College of Global Change and Earth System Science, Beijing Normal University)
 ;-
-PRO RESIZE_MOD35_LOW_CLOUD
+PRO RESIZE_MOD35_LC
   COMPILE_OPT IDL2
   
   ENVI, /RESTORE_BASE_SAVE_FILES
@@ -27,7 +27,7 @@ PRO RESIZE_MOD35_LOW_CLOUD
   IF FILE_TEST(outdir, /DIRECTORY, /WRITE) EQ 0 THEN FILE_MKDIR, outdir
   
   ;  Resizing all MOD35 loud cloud bands to same spatial resolution
-  pattern = 'MYD35_L2_A' + STRTRIM(STRING(year), 1) + '*_LowCloud.tif'
+  pattern = 'MYD35_L2_A' + STRTRIM(STRING(year), 1) + '*_LC.tif'
   flist = FILE_SEARCH(pattern, count = count, /FULLY_QUALIFY_PATH)
   IF count EQ 0 THEN RETURN
   
@@ -78,7 +78,7 @@ PRO RESIZE_MOD35_LOW_CLOUD
     IF (ps[0] NE out_ps[0]) OR (ps[1] NE out_ps[1]) THEN rfact = out_ps/ps ELSE rfact = [1, 1]
     
     fbname = FILE_BASENAME(fname, '.tif')
-    out_name = outdir + fbname + '_Resize.tif'
+    out_name = outdir + fbname + '_R.tif'
     PRINT, out_name
     ENVI_DOIT, 'RESIZE_DOIT', fid = fid, pos = pos, dims = dims, interp = 0, rfact = rfact, $
       out_name = out_name, r_fid = r_fid
