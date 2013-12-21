@@ -1,7 +1,7 @@
 ;+
 ;                    Algorithm for detecting low cloud
 ;
-;                       Version: 1.1.0 (2013-12-19)
+;                       Version: 1.2.0 (2013-12-21)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -51,26 +51,35 @@ PRO DETECTLOWCLOUD, cloudmask, lowcloud, DAY = DAY
     bitdata[*, *, i] = (data AND base) EQ base
   ENDFOR
   
-  ; Detecting high cloud including the situation that both low cloud and high cloud exist
-  highcloud = (bitdata[*, *, 1] EQ 0) OR (bitdata[*, *, 2] EQ 0) OR (bitdata[*, *, 3] EQ 0) OR (bitdata[*, *, 4] EQ 0)
-  hcidx = WHERE(highcloud EQ 1)
-  ; Detecting low cloud, which is underestimated as the situation that both low cloud and high cloud exist is excluded
-  ; (cloudy|probably cloudy) AND (no high cloud) AND (low cloud)
+  ; Detecting pure low cloud
+  ; (cloudy|probably cloudy) AND (no high cloud) AND (probable low cloud)
   ; Algorithm for day
-  ; (BIT2 EQ 0) AND ((BIT14 EQ 1) AND (BIT15 EQ 1) AND (BIT16 EQ 1) AND (BIT18 EQ 1)) AND ((BIT19 EQ 0) AND (BIT20 EQ 0))
+  ; (BIT2 EQ 0) AND ((BIT14 EQ 1) AND (BIT15 EQ 1) AND (BIT16 EQ 1) AND (BIT18 EQ 1)) AND ((BIT19 EQ 0) OR (BIT20 EQ 0))
   ; Algorithm for night
-  ; (BIT2 EQ 0) AND ((BIT14 EQ 1) AND (BIT15 EQ 1) AND (BIT17 EQ 1) AND (BIT18 EQ 1)) AND ((BIT19 EQ 0) AND (BIT27 EQ 0))
-  ; Value meaning
+  ; (BIT2 EQ 0) AND ((BIT14 EQ 1) AND (BIT15 EQ 1) AND (BIT17 EQ 1) AND (BIT18 EQ 1)) AND ((BIT19 EQ 0) OR (BIT27 EQ 0))
+  ; Classification scheme
   ; 0: background
-  ; 1: no low cloud
-  ; 2: low cloud
-  ; 3: high cloud
-  lowcloud = (bitdata[*, *, 0] EQ 0) AND ((bitdata[*, *, 1] EQ 1) AND (bitdata[*, *, 2] EQ 1) AND (bitdata[*, *, 3] EQ 1) AND (bitdata[*, *, 4] EQ 1)) $
-    AND ((bitdata[*, *, 5] EQ 0) AND (bitdata[*, *, 6] EQ 0))
-  lowcloud = lowcloud + 1
-  lowcloud[hcidx] = 3
-  ; Determine backgroud value (0)
-  bgidx = WHERE((cloudmask[*, *, 0] EQ 0) AND (cloudmask[*, *, 1] EQ 0) AND (cloudmask[*, *, 2] EQ 0) AND $
-    (cloudmask[*, *, 3] EQ 0) AND (cloudmask[*, *, 4] EQ 0) AND (cloudmask[*, *, 5] EQ 0))
-  lowcloud[bgidx] = 0
+  ; 1: pure low cloud
+  ; 2: obscure
+  ; 3: no low cloud
+  ; 4: probable low cloud (1 OR 2)
+  lowcloud = MAKE_ARRAY(dims[0], dims[1])
+  FOR i = 0, dims[0] - 1 DO BEGIN
+    FOR j = 0, dims[1] - 1 DO BEGIN
+      IF ARRAY_EQUAL(cloudmask[i, j, *], 0) THEN BEGIN
+        ; Background
+        lowcloud[i, j] = 0
+      ENDIF ELSE IF (bitdata[i, j, 5] EQ 0) OR (bitdata[i, j, 6] EQ 0) EQ 0 THEN BEGIN
+        ; No low cloud
+        lowcloud[i, j] = 3
+      ENDIF ELSE IF ((bitdata[i, j, 0] EQ 0) AND $
+        ((bitdata[i, j, 1] EQ 1) AND (bitdata[i, j, 2] EQ 1) AND (bitdata[i, j, 3] EQ 1) AND (bitdata[i, j, 4] EQ 1))) EQ 1 THEN BEGIN
+        ; Pure low cloud
+        lowcloud[i, j] = 1
+      ENDIF ELSE BEGIN
+        ; Obscure: pure high cloud and high cloud overlapping low cloud
+        lowcloud[i, j] = 2
+      ENDELSE
+    ENDFOR
+  ENDFOR
 END
