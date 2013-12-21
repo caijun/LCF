@@ -63,22 +63,22 @@ PRO DETECTLOWCLOUD, cloudmask, lowcloud, DAY = DAY
   ; 2: obscure
   ; 3: no low cloud
   ; 4: probable low cloud (1 OR 2)
-  lowcloud = MAKE_ARRAY(dims[0], dims[1])
+  lowcloud = BYTARR(dims[0], dims[1])
   FOR i = 0, dims[0] - 1 DO BEGIN
     FOR j = 0, dims[1] - 1 DO BEGIN
       IF ARRAY_EQUAL(cloudmask[i, j, *], 0) THEN BEGIN
         ; Background
-        lowcloud[i, j] = 0
+        lowcloud[i, j] = 0b
       ENDIF ELSE IF (bitdata[i, j, 5] EQ 0) OR (bitdata[i, j, 6] EQ 0) EQ 0 THEN BEGIN
         ; No low cloud
-        lowcloud[i, j] = 3
+        lowcloud[i, j] = 3b
       ENDIF ELSE IF ((bitdata[i, j, 0] EQ 0) AND $
         ((bitdata[i, j, 1] EQ 1) AND (bitdata[i, j, 2] EQ 1) AND (bitdata[i, j, 3] EQ 1) AND (bitdata[i, j, 4] EQ 1))) EQ 1 THEN BEGIN
         ; Pure low cloud
-        lowcloud[i, j] = 1
+        lowcloud[i, j] = 1b
       ENDIF ELSE BEGIN
         ; Obscure: pure high cloud and high cloud overlapping low cloud
-        lowcloud[i, j] = 2
+        lowcloud[i, j] = 2b
       ENDELSE
     ENDFOR
   ENDFOR
