@@ -1,7 +1,7 @@
 ;+
 ;            Subsetting MOYD35 low cloud via specific shapefile
 ;
-;                       Version: 1.0.5 (2013-12-19)
+;                      Version: 1.0.6 (2013-12-22)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -17,13 +17,14 @@ PRO SUBSET_MOD35_LC
   ENVI, /RESTORE_BASE_SAVE_FILES
   ENVI_BATCH_INIT, /NO_STATUS_WINDOW
   
-  ; Customize year and indir
+  ; Customize year and pdir
   year = 2003
-  indir = 'H:\People\ZhangYawen\C6\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\LowCloud\Resize\Mosaic\'
+  pdir = 'H:\People\ZhangYawen\C6\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\LowCloud\'
+  indir = pdir + 'Mosaic\'
   CD, indir
   
   ; Set output directory
-  outdir = indir + 'Subset\'
+  outdir = pdir + 'Subset\'
   IF FILE_TEST(outdir, /DIRECTORY, /WRITE) EQ 0 THEN FILE_MKDIR, outdir
   
   pattern = 'MYD35_L2_A' + STRTRIM(STRING(year), 1) + '*_LC_RM.tif'

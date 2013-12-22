@@ -3,7 +3,7 @@
 ;                To run the mosaicking procedure correctly,
 ;            firstly resize input files to same spatial resolution
 ;
-;                       Version: 1.3.7 (2013-12-19)
+;                       Version: 1.3.8 (2013-12-22)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -21,13 +21,14 @@ PRO MOSAIC_MOD35_LC
   ENVI, /RESTORE_BASE_SAVE_FILES
   ENVI_BATCH_INIT, /NO_STATUS_WINDOW
   
-  ; Customize year and indir
+  ; Customize year and pdir
   year = 2003
-  indir = 'H:\People\ZhangYawen\C6\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\LowCloud\Resize\'
+  pdir = 'H:\People\ZhangYawen\C6\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\LowCloud\'
+  indir = pdir + 'Resize\'
   CD, indir
   
   ; Set output directory
-  outdir = indir + 'Mosaic\'
+  outdir = pdir + 'Mosaic\'
   IF FILE_TEST(outdir, /DIRECTORY, /WRITE) EQ 0 THEN FILE_MKDIR, outdir
   ; Write unvailable data file to nafile
   nafile = outdir + 'na.txt'
@@ -46,7 +47,7 @@ PRO MOSAIC_MOD35_LC
       flist = FILE_SEARCH(pattern, count = count, /TEST_REGULAR)
       IF count EQ 0 THEN BEGIN
         OPENW, lun, nafile, /GET_LUN, /APPEND
-        PRINTF, lun, STRTRIM(STRING(year), 1) + STRTRIM(STRING(DOY[i], format = '(I03)'), 1)
+        PRINTF, lun, STRTRIM(STRING(year), 1) + STRTRIM(STRING(DOY[i], format = '(I03)'), 1) + '_' + co[j]
         FREE_LUN, lun
         CONTINUE
       ENDIF

@@ -1,7 +1,7 @@
 ;+
 ;       Resizing all MOYD35 low cloud bands to same spatial resolution
 ;
-;                       Version: 1.2.5 (2013-12-19)
+;                       Version: 1.2.6 (2013-12-22)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -17,13 +17,13 @@ PRO RESIZE_MOD35_LC
   ENVI, /RESTORE_BASE_SAVE_FILES
   ENVI_BATCH_INIT, /NO_STATUS_WINDOW
   
-  ; Customize year and indir
+  ; Customize year and pdir
   year = 2003
-  indir = 'H:\People\ZhangYawen\C6\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\LowCloud\'
-  CD, indir
+  pdir = 'H:\People\ZhangYawen\C6\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\LowCloud\'
+  CD, pdir
   
   ; Set output directory
-  outdir = indir + 'Resize\'
+  outdir = pdir + 'Resize\'
   IF FILE_TEST(outdir, /DIRECTORY, /WRITE) EQ 0 THEN FILE_MKDIR, outdir
   
   ;  Resizing all MOD35 loud cloud bands to same spatial resolution

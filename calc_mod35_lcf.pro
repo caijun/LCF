@@ -1,7 +1,7 @@
 ;+
 ;               Calculating monthly LCF from MOYD35 low cloud
 ;
-;                       Version: 1.2.2 (2013-12-20)
+;                       Version: 1.2.3 (2013-12-22)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -20,7 +20,7 @@ PRO CALC_MOD35_LCF
   ; Customize year and indir
   year = 2003
   pdir = 'H:\People\ZhangYawen\C6\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\LowCloud\'
-  indir = pdir + 'Resize\Mosaic\Subset\'
+  indir = pdir + 'Subset\'
   CD, indir
   
   ; Set output directory
