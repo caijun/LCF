@@ -1,7 +1,7 @@
 ;+
 ;               Calculating monthly LCF from MOYD35 low cloud
 ;
-;                       Version: 1.2.3 (2013-12-22)
+;                       Version: 1.3.3 (2013-12-25)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -19,15 +19,13 @@ PRO CALC_MOD35_LCF
   
   ; Customize year and indir
   year = 2003
-  pdir = 'H:\People\ZhangYawen\C6\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\LowCloud\'
+  pdir = 'I:\TT\People\ZhangYawen\C6\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\LowCloud\'
   indir = pdir + 'Subset\'
   CD, indir
   
   ; Set output directory
   outdir = pdir + 'LCF\'
   IF FILE_TEST(outdir, /DIRECTORY, /WRITE) EQ 0 THEN FILE_MKDIR, outdir
-  ; Output product: PPR, LCF1, LCF2
-  prod = ['PPR', 'LCF1', 'LCF2']
   ; Coverage option: 0 - day data, 1 - night data
   co = ['0', '1']
   
@@ -94,7 +92,7 @@ PRO CALC_MOD35_LCF
       ENDFOR
       
       dims = SIZE(lowcloud, /DIMENSIONS)
-      ; Unique pixel value
+      ; Unique pixel value: 1, 2, 3
       pv = lowcloud[UNIQ(lowcloud, SORT(lowcloud))]
       freq = INTARR(dims[0], dims[1], N_ELEMENTS(pv))
       FOR m = 0, dims[0] - 1 DO BEGIN
@@ -105,25 +103,28 @@ PRO CALC_MOD35_LCF
           ENDFOR
         ENDFOR
       ENDFOR
-      ; Pure pixel ratio: (#1 + #2) / madc
-      ppr = DOUBLE((freq[*, *, 1] + freq[*, *, 2])) / dims[2]
-      ; Low cloud frequency 1: #2 / (#1 + #2)
-      lcf1 = DOUBLE(freq[*, *, 2]) / (freq[*, *, 1] + freq[*, *, 2])
-      ; Low cloud frequency 2: #2 / madc
-      lcf2 = DOUBLE(freq[*, *, 2]) / dims[2]
-      prodat = [[[ppr]], [[lcf1]], [[lcf2]]]
+      ; Pure low cloud frequency: #1 / madc
+      lcf1 = DOUBLE(freq[*, *, 0]) / dims[2]
+      ; Obscure frequency 1: #2 / madc
+      obsf = DOUBLE(freq[*, *, 1]) / dims[2]
+      ; No low cloud frequency 2: #3 / madc
+      nlcf = DOUBLE(freq[*, *, 2]) / dims[2]
+      ; Probable low cloud frequency: (#1 + #2) / madc
+      lcf2 = DOUBLE(freq[*, *, 0] + freq[*, *, 1]) / dims[2]
+      prodat = [[[lcf1]], [[obsf]], [[nlcf]], [[lcf2]]]
       
       ; Set output file name
       fbname = FILE_BASENAME(fname, '.tif')
       fbname = STRMID(fbname, 0, 14)
-      FOR j = 0, N_ELEMENTS(prod) - 1 DO BEGIN
-        out_name = outdir + fbname + STRTRIM(STRING(i + 1, format = '(I02)'), 1) + '_' + co[t]+ '_' + prod[j] + '.tif'
-        PRINT, out_name
-        bnames = ['Monthly ' + prod[j] + ' (' + STRTRIM(STRING(madc), 1) + '/' + STRTRIM(STRING(mdays[i]), 1) + ')']
-        ENVI_WRITE_ENVI_FILE, prodat[*, *, j], out_name = out_name, bnames = bnames, map_info = map_info, r_fid = r_fid
-        
-        ENVI_FILE_MNG, id = r_fid, /REMOVE
-      ENDFOR
+      out_name = outdir + fbname + STRTRIM(STRING(i + 1, format = '(I02)'), 1) + '_' + co[t]+ '.tif'
+      PRINT, out_name
+      bnames = [['Monthly LCF1 (' + STRTRIM(STRING(madc), 1) + '/' + STRTRIM(STRING(mdays[i]), 1) + ')'], $
+        ['Monthly OF (' + STRTRIM(STRING(madc), 1) + '/' + STRTRIM(STRING(mdays[i]), 1) + ')'], $
+        ['Monthly NLCF (' + STRTRIM(STRING(madc), 1) + '/' + STRTRIM(STRING(mdays[i]), 1) + ')'], $
+        ['Monthly LCF2 (' + STRTRIM(STRING(madc), 1) + '/' + STRTRIM(STRING(mdays[i]), 1) + ')']]
+      ENVI_WRITE_ENVI_FILE, prodat, out_name = out_name, bnames = bnames, map_info = map_info, r_fid = r_fid
+      
+      ENVI_FILE_MNG, id = r_fid, /REMOVE
       PTR_FREE, ADEM[i]
     ENDFOR
     PTR_FREE, ADEM
