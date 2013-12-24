@@ -1,7 +1,7 @@
 ;+
 ;           Getting ROI data from specific img via specific evf
 ;
-;                       Version: 1.0.0 (2012-10-18)
+;                       Version: 1.1.0 (2013-12-25)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -41,7 +41,8 @@ PRO GETDATAVIAEVF, img_fname, evf_fname, data
   roi_id = ENVI_CREATE_ROI(color = 4, name = 'Sampling Point', ns = ns, nl = nl)
   ENVI_DEFINE_ROI, roi_id, /point, xpts = REFORM(xf), ypts = REFORM(yf)
   
-  data = ENVI_GET_ROI_DATA(roi_id, fid = fid, pos = 0)
+  pos = INDGEN(nb)
+  data = ENVI_GET_ROI_DATA(roi_id, fid = fid, pos = pos)
   
   ENVI_FILE_MNG, id = fid, /REMOVE
 END
