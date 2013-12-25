@@ -1,7 +1,7 @@
 ;+
 ;                    Algorithm for detecting low cloud
 ;
-;                       Version: 1.2.0 (2013-12-21)
+;                       Version: 1.2.1 (2013-12-25)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -69,11 +69,11 @@ PRO DETECTLOWCLOUD, cloudmask, lowcloud, DAY = DAY
       IF ARRAY_EQUAL(cloudmask[i, j, *], 0) THEN BEGIN
         ; Background
         lowcloud[i, j] = 0b
-      ENDIF ELSE IF (bitdata[i, j, 5] EQ 0) OR (bitdata[i, j, 6] EQ 0) EQ 0 THEN BEGIN
+      ENDIF ELSE IF (bitdata[i, j, 5] AND bitdata[i, j, 6]) EQ 1 THEN BEGIN
         ; No low cloud
         lowcloud[i, j] = 3b
       ENDIF ELSE IF ((bitdata[i, j, 0] EQ 0) AND $
-        ((bitdata[i, j, 1] EQ 1) AND (bitdata[i, j, 2] EQ 1) AND (bitdata[i, j, 3] EQ 1) AND (bitdata[i, j, 4] EQ 1))) EQ 1 THEN BEGIN
+        (bitdata[i, j, 1] AND bitdata[i, j, 2] AND bitdata[i, j, 3] AND bitdata[i, j, 4])) EQ 1 THEN BEGIN
         ; Pure low cloud
         lowcloud[i, j] = 1b
       ENDIF ELSE BEGIN
