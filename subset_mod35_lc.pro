@@ -1,7 +1,7 @@
 ;+
 ;            Subsetting MOYD35 low cloud via specific shapefile
 ;
-;                      Version: 1.0.6 (2013-12-22)
+;                      Version: 1.0.7 (2013-12-26)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -19,7 +19,7 @@ PRO SUBSET_MOD35_LC
   
   ; Customize year and pdir
   year = 2003
-  pdir = 'H:\People\ZhangYawen\C6\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\LowCloud\'
+  pdir = 'I:\TT\People\ZhangYawen\C6\MYD35GeoRef\' + STRTRIM(STRING(year), 1) + '\LowCloud\'
   indir = pdir + 'Mosaic\'
   CD, indir
   
@@ -40,7 +40,7 @@ PRO SUBSET_MOD35_LC
     pos = INDGEN(nb)
     
     ; Open shapefile
-    shpfile = 'H:\People\ZhangYawen\Vector\NorthChinaPlain\StudyArea\NCP.shp'
+    shpfile = 'I:\TT\People\ZhangYawen\Vector\NorthChinaPlain\StudyArea\NCP.shp'
     oshp = OBJ_NEW('IDLffshape', shpfile)
     oshp ->GETPROPERTY, n_entities = n_ent, attribute_info = attr_info, n_attributes = n_attr, $
       entity_type = ent_type
@@ -55,7 +55,7 @@ PRO SUBSET_MOD35_LC
         ; Create ROI
         roi_shp[ishp] = ENVI_CREATE_ROI(ns = ns, nl = nl)
         ; xmap: column vector, reform(xmap): row vector
-        ENVI_DEFINE_ROI, roi_shp[ishp], /polygon, xpts = REFORM(xmap), ypts = REFORM(ymap)
+        ENVI_DEFINE_ROI, roi_shp[ishp], /POLYGON, xpts = REFORM(xmap), ypts = REFORM(ymap)
         
         ; Bounding box of shape
         IF ishp EQ 0 THEN BEGIN
@@ -86,10 +86,10 @@ PRO SUBSET_MOD35_LC
     ENVI_DOIT, 'ENVI_SUBSET_VIA_ROI_DOIT', background = 0, fid = fid, dims = dims, out_name = out_name,$
       ns = ns, nl = nl, pos = pos, roi_ids = roi_shp
       
-    ENVI_FILE_MNG, id = fid, /remove
+    ENVI_FILE_MNG, id = fid, /REMOVE
     fids = ENVI_GET_FILE_IDS()
     IF (fids[0] EQ -1) THEN RETURN
-    ENVI_FILE_MNG, id = fids[0], /remove
+    ENVI_FILE_MNG, id = fids[0], /REMOVE
   ENDFOR
   
   ENVI_BATCH_EXIT
