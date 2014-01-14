@@ -16,8 +16,8 @@ IDL procedures for calculating Low Cloud Frequency (LCF) from the MODIS Cloud Pr
 3. Run *mosaic_mod35_lc.pro* to combine multiple images into a single seamless composite image that completely covers the study area for day (0) or night (1).
 4. Run *subset_mod35_lc.pro* to subset the mosaicking image via the shapefile of study area.
 
-### LCF calculation
+#### LCF calculation
 1. Run *calc_mod35_lcf.pro* to calculate *pure low cloud frequency*, *obscure frequency*, *no low cloud frequency* and *probable low cloud frequency*. The corresponding band names of resulting images are *Monthly LCF1*, *Monthly OF*, *Monthly NLCF* and *Monthly LCF2*.
 
-### LCF extraction
+#### LCF extraction
 1. Run *get_mod35_lcf_via_evf.pro* to extract the LCF of ROI storing in an ENVI evf file to txt file for further analysis in [R](http://www.r-project.org/).
