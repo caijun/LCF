@@ -1,7 +1,7 @@
 ;+
 ;               Calculating monthly LCF from MOYD35 low cloud
 ;
-;                       Version: 1.3.3 (2013-12-25)
+;                       Version: 1.4.3 (2014-01-14)
 ;
 ;                    Author: Tony Tsai, Ph.D. Student
 ;          (Center for Earth System Science, Tsinghua University)
@@ -56,40 +56,51 @@ PRO CALC_MOD35_LCF
     ENDFOR
     
     FOR i = 0, N_ELEMENTS(ADEM) - 1 DO BEGIN
-      ; Calculate the output spatial dims
-      ; Monthly available day count
+      ; Call the layer stacking routine to ensure that multiple images have the same samples and lines
+      ; Monthly Available Day Count
       madc = N_ELEMENTS(*ADEM[i])
       IF madc EQ 0 THEN CONTINUE
       
-      nsarr = INTARR(madc)
-      nlarr = INTARR(madc)
+      ; Use the only band from all files and all spatial pixels
+      ; First build the array of FID, POS and DIMS for all files
+      fid = LONARR(madc)
+      pos = LONARR(madc)
+      dims = LONARR(5, madc)
       FOR j = 0, madc - 1 DO BEGIN
         fname = (*ADEM[i])[j]
         PRINT, fname
         
-        ENVI_OPEN_DATA_FILE, fname, r_fid = fid
-        ENVI_FILE_QUERY, fid, ns = ns, nl = nl
-        nsarr[j] = ns
-        nlarr[j] = nl
+        ENVI_OPEN_FILE, fname, r_fid = t_fid
+        IF (t_fid EQ -1) THEN RETURN
         
-        IF j EQ 0 THEN map_info = ENVI_GET_MAP_INFO(fid = fid)
-        
-        ENVI_FILE_MNG, id = fid, /REMOVE
+        ENVI_FILE_QUERY, t_fid, dims = t_dims
+        fid[j] = t_fid
+        pos[j] = 0
+        dims[*, j] = t_dims
       ENDFOR
-      ; Minimum ns and nl
-      nsmin = MIN(nsarr)
-      nlmin = MIN(nlarr)
-      lowcloud = MAKE_ARRAY(nsmin, nlmin, madc)
-      dims = [-1, 0, nsmin - 1, 0, nlmin - 1]
       
-      FOR j = 0, madc - 1 DO BEGIN
-        fname = (*ADEM[i])[j]
+      ; Set the output projection and pixel size
+      out_proj = ENVI_GET_PROJECTION(fid = fid[0], pixel_size = out_ps)
+      ; Set the output data type
+      ENVI_FILE_QUERY, fid[0], data_type = out_dt
+      ; Save the result to temporal image
+      out_name = 'temp.img'
+      
+      ; Set the exclusive keyword
+      ; Use nearest neighbor for the interpolation method
+      ENVI_DOIT, 'ENVI_LAYER_STACKING_DOIT', fid = fid, pos = pos, dims = dims, $
+        /EXCLUSIVE, out_dt = out_dt, out_name = out_name, interp = 0, out_ps = out_ps, $
+        out_proj = out_proj, r_fid = r_fid
         
-        ENVI_OPEN_DATA_FILE, fname, r_fid = fid
-        lowcloud[*, *, j] = ENVI_GET_DATA(fid = fid, dims = dims, pos = 0)
-        
-        ENVI_FILE_MNG, id = fid, /REMOVE
-      ENDFOR
+      ENVI_FILE_QUERY, r_fid, dims = dims, nb = nb, ns = ns,  nl = nl, fname = out_name
+      map_info = ENVI_GET_MAP_INFO(fid = r_fid)
+      
+      lowcloud = MAKE_ARRAY(ns, nl, nb)
+      FOR j = 0, nb - 1 DO lowcloud[*, *, j] = ENVI_GET_DATA(fid = r_fid, dims = dims, pos = j)
+      
+      fids = [fid, r_fid]
+      FOR j = 0, N_ELEMENTS(fids) - 1 DO ENVI_FILE_MNG, id = fids[j], /REMOVE
+      FILE_DELETE, out_name
       
       dims = SIZE(lowcloud, /DIMENSIONS)
       ; Unique pixel value: 1, 2, 3
