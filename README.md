@@ -18,5 +18,6 @@ IDL procedures for calculating Low Cloud Frequency (LCF) from the MODIS Cloud Pr
 
 ### LCF calculation
 1. Run *calc_mod35_lcf.pro* to calculate *pure low cloud frequency*, *obscure frequency*, *no low cloud frequency* and *probable low cloud frequency*. The corresponding band names of resulting images are *Monthly LCF1*, *Monthly OF*, *Monthly NLCF* and *Monthly LCF2*.
+
 ### LCF extraction
 1. Run *get_mod35_lcf_via_evf.pro* to extract the LCF of ROI storing in an ENVI evf file to txt file for further analysis in [R](http://www.r-project.org/).
