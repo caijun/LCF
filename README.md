@@ -13,7 +13,7 @@ IDL procedures for calculating Low Cloud Frequency (LCF) from the MODIS Cloud Pr
 #### Data preprocessing
 1. Run `detect_lc_from_mod35.pro` to detect low cloud from MOD/MYD35 Cloud Mask. The cloud classification scheme is: 0 - background, 1 - pure low cloud, 2 - obscure, 3 - no low cloud and 4 - probable low cloud (1 or 2).
 2. Run `resize_mod35_lc.pro` to resample all low cloud image to same pixel size. It's an essential step before gettting the following step 3 correctly execution.
-3. Run `mosaic_mod35_lc.pro to combine multiple images into a single seamless composite image that completely covers the study area for day (0) or night (1).
+3. Run `mosaic_mod35_lc.pro` to combine multiple images into a single seamless composite image that completely covers the study area for day (0) or night (1).
 4. Run `subset_mod35_lc.pro` to subset the mosaicking image via the shapefile of study area.
 
 #### LCF calculation
