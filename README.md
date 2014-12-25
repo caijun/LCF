@@ -24,7 +24,7 @@ IDL procedures for calculating Low Cloud Frequency (LCF) from the MODIS Cloud Pr
 
 ## Publications
 
-The procedures are developed for the following research studies.
+The procedures are developed for following research studies.
 
 [1] Zhang, Y., Lu, H., & Cai, J. (2014, July). [Estimating regional amount of low clouds over North China plain from multi-source remote sensing data](http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=6947396&tag=1). In *Geoscience and Remote Sensing Symposium (IGARSS)*, 2014 IEEE International} (pp. 4131-4134). IEEE.
 
