@@ -21,3 +21,11 @@ IDL procedures for calculating Low Cloud Frequency (LCF) from the MODIS Cloud Pr
 
 #### LCF extraction
 1. Run `get_mod35_lcf_via_evf.pro` to extract the LCF of ROI storing in an ENVI evf file to txt file for further analysis in [R](http://www.r-project.org/).
+
+## Publications
+
+The procedures are developed for the following research studies.
+
+[1] Zhang, Y., Lu, H., & Cai, J. (2014, July). [Estimating regional amount of low clouds over North China plain from multi-source remote sensing data](http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=6947396&tag=1). In *Geoscience and Remote Sensing Symposium (IGARSS)*, 2014 IEEE International} (pp. 4131-4134). IEEE.
+
+[2] Zhang, Y., Lu, H., & Cai, J. (2014, November). [Towards the comparison of satellite and ground based cloud amount over China](http://proceedings.spiedigitallibrary.org/proceeding.aspx?articleid=1935141). In *SPIE Asia Pacific Remote Sensing* (pp. 92590A-92590A-8). International Society for Optics and Photonics.
