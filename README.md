@@ -28,6 +28,6 @@ The procedures are developed for following studies.
 
 [1] Lu, H., Zhang, Y., & Cai, J. (2015). [Consistency and differences between remotely sensed and surface observed total cloud cover over China](http://www.tandfonline.com/doi/full/10.1080/01431161.2015.1072651). *International Journal of Remote Sensing*, 36(16), 4160-4176.
 
-[2] Zhang, Y., Lu, H., & Cai, J. (2014, November). [Towards the comparison of satellite and ground based cloud amount over China](http://proceedings.spiedigitallibrary.org/proceeding.aspx?articleid=1935141). In *SPIE Asia Pacific Remote Sensing* (pp. 92590A-92590A-8). International Society for Optics and Photonics.
+[2] Zhang, Y., Lu, H., & Cai, J. (2014, November). [Towards the comparison of satellite and ground based cloud amount over China](http://proceedings.spiedigitallibrary.org/proceeding.aspx?articleid=1935141). In *SPIE Asia Pacific Remote Sensing* (pp. 92590A-92590A). International Society for Optics and Photonics.
 
-[3] Zhang, Y., Lu, H., & Cai, J. (2014, July). [Estimating regional amount of low clouds over North China plain from multi-source remote sensing data](http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=6947396&tag=1). In *Geoscience and Remote Sensing Symposium (IGARSS)*, 2014 IEEE International} (pp. 4131-4134). IEEE.
+[3] Zhang, Y., Lu, H., & Cai, J. (2014, July). [Estimating regional amount of low clouds over North China plain from multi-source remote sensing data](http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=6947396&tag=1). In *2014 IEEE Geoscience and Remote Sensing Symposium* (pp. 4131-4134). IEEE.
